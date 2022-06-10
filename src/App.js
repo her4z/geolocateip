@@ -5,18 +5,11 @@ function App() {
 
   useEffect(() => {
     fetch("/api").then((res) => {
-      const {statusText} = res;
+      const { statusText } = res;
       setDataFetched(statusText);
     });
   }, []);
-  return(
-    <div>
-        {
-          dataFetched? `${dataFetched}` : ""
-        }
-    </div>
-  )
-    
+  return <div>{dataFetched ? `${dataFetched}` : ""}</div>;
 }
 
 export default App;
