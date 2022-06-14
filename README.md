@@ -4,7 +4,7 @@ Geolocate IP Address App
 
 For running the app in Docker container:
 -$docker build -f Dockerfile -t [imageTag] .
--$docker run -it -p 8000:5000 [imageTag]
+-$docker run -it -p [PORT]:5000 [imageTag]
 
 For running the app in production mode: 
 -$npm install
