@@ -1,7 +1,7 @@
 const geolocateIPController = require("../controllers/geolocateIP.controller");
 
 const geolocateIP = (app) => {
-  app.get("/geolocateIP", geolocateIPController.getLocation);
+  app.get("/geolocateIP/:ip?", geolocateIPController.getLocation);
 
   return app;
 };
