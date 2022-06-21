@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 8080;
 
 const { geolocateIP } = require("./routes/geolocateIP.routes");
 const { nearestAPICall } = require("./routes/nearestAPICall.routes");
