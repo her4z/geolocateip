@@ -1,0 +1,43 @@
+.home {
+  height: 100vh;
+}
+.lbl-title {
+  text-align: center;
+  padding: 1%;
+}
+.btn-search {
+  text-align: center;
+  height: 70%;
+  background-color: black;
+}
+.txt-search {
+  text-align: center;
+  width: 100%;
+}
+.container-searchbar {
+  margin: 0 auto;
+  width: 60%;
+  height: 65%;
+  align-items: center;
+}
+.grid-searchbar {
+  padding-top: 5%;
+}
+.MuiGrid-item {
+  display: flex;
+  justify-items: center;
+}
+
+.MuiTextField-root {
+  height: 100%;
+}
+
+.txt-result .MuiOutlinedInput-root,
+input {
+  height: 50%;
+}
+.error-alert {
+  width: 40%;
+  margin-left: 9%;
+  margin-top: 5%;
+}
