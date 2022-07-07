@@ -5,8 +5,10 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
+const apicache = require("apicache");
 const app = express();
 const PORT = 8080;
+let cache = apicache.middleware;
 
 const { geolocateIP } = require("./routes/geolocateIP.routes");
 const { nearestAPICall } = require("./routes/nearestAPICall.routes");
@@ -34,6 +36,8 @@ geolocateIP(router);
 nearestAPICall(router);
 averageAPICall(router);
 farestAPICall(router);
+
+// app.use(cache()); removed because of problems with counting api calls
 
 app.use("/api", router);
 

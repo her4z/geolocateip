@@ -1,6 +1,8 @@
 import { getTimeByTimezone } from "../utils/getTimeByTimezone";
-import { calculateDistance } from "../utils/calculateDistance";
+import { calculateDistanceInKM } from "../utils/calculateDistance";
 const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 
 const getLocation = async (req, res) => {
   let { ip } = req.params;
@@ -40,9 +42,13 @@ const getLocation = async (req, res) => {
 
     timezones = await getTimeByTimezone(timezones);
 
-    let distance_from_ba = await calculateDistance([latitude, longitude]);
+    const kms_from_ba = await calculateDistanceInKM([latitude, longitude]);
+    const distance_from_ba = `${kms_from_ba}kms from (${[
+      latitude,
+      longitude,
+    ]}) to Buenos Aires (-34.603722, -58.381592)`;
 
-    const locationData = {
+    const responseData = {
       ip,
       country_name,
       country_code,
@@ -53,7 +59,16 @@ const getLocation = async (req, res) => {
       timezones,
       distance_from_ba,
     };
-    res.send(locationData);
+
+    const tmpString = JSON.stringify({
+      country_name,
+      kms_from_ba,
+      calls: 1,
+    });
+
+    writeTempData(tmpString);
+
+    res.send(responseData);
   } else {
     res.status(400).send("Missing IP address");
   }
@@ -97,6 +112,72 @@ const USDToCurrency = async (currency) => {
     }
   );
   return await res.json();
+};
+
+/**
+ * Creates tmp/api-history.json if not exists, and appends data into it
+ * @param {object} data
+ * @returns {object}
+ */
+const writeTempData = async (tmpString) => {
+  const dirExists = await fs.existsSync(
+    path.join(__dirname, "..", "/tmp/api-history.json")
+  );
+
+  if (!dirExists) {
+    await fs.mkdirSync(path.join(__dirname, "..", "/tmp"));
+    await fs.appendFileSync(
+      path.join(__dirname, "..", "/tmp/api-history.json"),
+      "[]"
+    );
+  }
+
+  fs.readFile(
+    path.join(__dirname, "..", "/tmp/api-history.json"),
+    async (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        let fileContent = data.toString();
+        let fileContentJSON = JSON.parse(fileContent);
+        let tmpStringJSON = JSON.parse(tmpString);
+
+        fileContentJSON.map((item) => {
+          if (item.country_name === tmpStringJSON.country_name) {
+            let itemUpdated = item;
+            itemUpdated.calls++;
+            return itemUpdated;
+          }
+          return item;
+        });
+
+        let file = await fs.openSync(
+          path.join(__dirname, "..", "/tmp/api-history.json"),
+          "r+"
+        );
+
+        if (JSON.stringify(fileContentJSON) !== fileContent) {
+          // If the file content was updated overwrite the file
+          fileContent = JSON.stringify(fileContentJSON);
+          let bufferedText = Buffer.from(fileContent);
+          fs.writeSync(file, bufferedText, 0, bufferedText.length);
+        } else {
+          if (fileContent.length > 3) {
+            //If it is the first call don't add a comma after tmpString value
+            fileContent = fileContent.substring(1);
+            let bufferedText = Buffer.from(`${tmpString},` + fileContent);
+            fs.writeSync(file, bufferedText, 0, bufferedText.length, 1);
+          } else {
+            fileContent = fileContent.substring(1);
+            let bufferedText = Buffer.from(tmpString + fileContent);
+            fs.writeSync(file, bufferedText, 0, bufferedText.length, 1);
+          }
+        }
+
+        fs.close(file);
+      }
+    }
+  );
 };
 
 module.exports = { getLocation };
