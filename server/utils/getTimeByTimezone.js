@@ -1,3 +1,8 @@
+/**
+ * Calculates the current time(hh:mm:ss) for all timezones
+ * @param {string[]} timezones
+ * @returns {string}
+ */
 const getTimeByTimezone = (timezones) => {
   const localTime = new Date().getTime();
   let timezonesMsg = [];
