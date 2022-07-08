@@ -17,12 +17,76 @@ export default class Home extends Component {
       ipText: "",
       resultText: "",
       waiting: false,
+      waitingAverage: false,
+      waitingFarest: false,
+      waitingNearest: false,
       showError: false,
+      averageResponse: "",
+      nearestResponse: "",
+      farestResponse: "",
     };
+  }
+
+  componentDidMount() {
+    this.getNearestCall();
+    this.getFarestCall();
+    this.getAverageCall();
+  }
+
+  getNearestCall() {
+    this.setState({ waitingNearest: true });
+
+    fetch("/api/nearestAPICall").then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          this.setState({
+            nearestResponse: JSON.stringify(data),
+            waitingNearest: false,
+          });
+        });
+      } else {
+        this.setState({ waitingNearest: false });
+      }
+    });
+  }
+
+  getFarestCall() {
+    this.setState({ waitingFarest: true });
+
+    fetch("/api/farestAPICall").then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          this.setState({
+            farestResponse: JSON.stringify(data),
+            waitingFarest: false,
+          });
+        });
+      } else {
+        this.setState({ waitingFarest: false });
+      }
+    });
+  }
+
+  getAverageCall() {
+    this.setState({ waitingAverage: true });
+
+    fetch("/api/averageAPICall").then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          this.setState({
+            averageResponse: `${JSON.stringify(data)} KMs`,
+            waitingAverage: false,
+          });
+        });
+      } else {
+        this.setState({ waitingAverage: false });
+      }
+    });
   }
 
   geolocateIP() {
     this.setState({ waiting: true });
+
     fetch(`/api/geolocateIP/${this.state.ipText}`).then((res) => {
       if (res.ok) {
         res.json().then((data) => {
@@ -77,7 +141,7 @@ export default class Home extends Component {
           </Collapse>
           <TextField
             className="txt-result"
-            disabled={true}
+            disabled
             multiline
             style={{
               paddingLeft: "8.5%",
@@ -87,6 +151,67 @@ export default class Home extends Component {
             }}
             value={this.state.resultText}
           ></TextField>
+          <Typography
+            variant="h3"
+            className="lbl-stats"
+            style={{ marginTop: "-15%" }}
+          >
+            Stats
+          </Typography>
+          <div>
+            <Typography variant="h6" className="lbl-stats-subtitle">
+              Average KMs per API Call
+            </Typography>
+            <TextField
+              value={this.state.averageResponse}
+              className="txt-stats"
+              disabled
+              style={{ width: "80%", paddingRight: "5%", paddingLeft: "5%" }}
+            ></TextField>
+            <LoadingButton
+              variant="outlined"
+              onClick={() => this.getAverageCall()}
+              loading={this.state.waitingAverage}
+            >
+              Refresh
+            </LoadingButton>
+          </div>
+          <div>
+            <Typography variant="h6" className="lbl-stats-subtitle">
+              Farest API Call
+            </Typography>
+            <TextField
+              value={this.state.farestResponse}
+              className="txt-stats"
+              disabled
+              style={{ width: "80%", paddingRight: "5%", paddingLeft: "5%" }}
+            ></TextField>
+            <LoadingButton
+              variant="outlined"
+              onClick={() => this.getFarestCall()}
+              loading={this.state.waitingFarest}
+            >
+              Refresh
+            </LoadingButton>
+          </div>
+          <div>
+            <Typography variant="h6" className="lbl-stats-subtitle">
+              Nearest API Call
+            </Typography>
+            <TextField
+              value={this.state.nearestResponse}
+              className="txt-stats"
+              disabled
+              style={{ width: "80%", paddingRight: "5%", paddingLeft: "5%" }}
+            ></TextField>
+            <LoadingButton
+              variant="outlined"
+              onClick={() => this.getNearestCall()}
+              loading={this.state.waitingNearest}
+            >
+              Refresh
+            </LoadingButton>
+          </div>
         </Paper>
       </div>
     );
