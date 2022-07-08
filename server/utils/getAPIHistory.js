@@ -6,11 +6,18 @@ const path = require("path");
  * @returns {string}
  */
 const getAPIHistory = () => {
-  const fileContent = fs.readFileSync(
-    path.join(__dirname, "..", "tmp/api-history.json")
+  const dirExists = fs.existsSync(
+    path.join(__dirname, "..", "/tmp/api-history.json")
   );
-  const APIHistory = fileContent.toString();
-  return APIHistory;
+
+  if (dirExists) {
+    const fileContent = fs.readFileSync(
+      path.join(__dirname, "..", "tmp/api-history.json")
+    );
+    const APIHistory = fileContent.toString();
+    return APIHistory;
+  }
+  return;
 };
 
 module.exports = { getAPIHistory };

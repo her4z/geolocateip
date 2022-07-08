@@ -2,19 +2,24 @@ import { getAPIHistory } from "../utils/getAPIHistory";
 
 const getDistance = async (req, res) => {
   const apiHistory = await getAPIHistory();
-  const apiHistoryJSON = JSON.parse(apiHistory);
 
-  const distances = apiHistoryJSON.map((item) => {
-    return item.kms_from_ba;
-  });
+  if (apiHistory) {
+    const apiHistoryJSON = JSON.parse(apiHistory);
 
-  const minDistance = Math.min(...distances);
+    const distances = apiHistoryJSON.map((item) => {
+      return item.kms_from_ba;
+    });
 
-  const minDistanceIndex = distances.indexOf(minDistance);
+    const minDistance = Math.min(...distances);
 
-  const minDistanceData = apiHistoryJSON[minDistanceIndex];
+    const minDistanceIndex = distances.indexOf(minDistance);
 
-  res.send(minDistanceData || null);
+    const minDistanceData = apiHistoryJSON[minDistanceIndex];
+
+    res.send(minDistanceData);
+  } else {
+    res.status(503).send();
+  }
 };
 
 module.exports = { getDistance };
